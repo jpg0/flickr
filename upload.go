@@ -66,7 +66,7 @@ func streamUploadBody(client *FlickrClient, photo io.Reader, body *io.PipeWriter
 type UploadParams struct {
 	Title, Description           string
 	Tags                         []string
-	IsPublic, IsFamily, IsFriend bool
+	IsDefault, IsPublic, IsFamily, IsFriend bool
 	ContentType                  int
 	Hidden                       int
 	SafetyLevel                  int
@@ -107,9 +107,12 @@ func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
 		}
 		return "0"
 	}
-	client.Args.Set("is_public", boolString(params.IsPublic))
-	client.Args.Set("is_friend", boolString(params.IsFriend))
-	client.Args.Set("is_family", boolString(params.IsFamily))
+
+	if (!params.IsDefault) {
+		client.Args.Set("is_public", boolString(params.IsPublic))
+		client.Args.Set("is_friend", boolString(params.IsFriend))
+		client.Args.Set("is_family", boolString(params.IsFamily))
+	}
 
 	if params.ContentType >= 1 && params.ContentType <= 3 {
 		client.Args.Set("content_type", strconv.Itoa(params.ContentType))
