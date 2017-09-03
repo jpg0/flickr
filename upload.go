@@ -8,7 +8,7 @@ import (
 	"google.golang.org/appengine/log"
 	"mime/multipart"
 	"net/http"
-	//"os"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -131,20 +131,20 @@ func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
 // no parameters will be added to the request and Flickr will set User's
 // default preferences.
 // This call must be signed with write permissions
-//func UploadFile(client *FlickrClient, path string, optionalParams *UploadParams) (*UploadResponse, error) {
-//	file, err := os.Open(path)
-//	if err != nil {
-//		return nil, err
-//	}
-//	defer file.Close()
-//
-//	return UploadReader(client, file, file.Name(), optionalParams)
-//}
+func UploadFile(client *FlickrClient, path string, optionalParams *UploadParams) (*UploadResponse, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	return UploadReader(client, file, file.Name(), optionalParams)
+}
 
 // UploadReader does same as UploadFile but the photo file is passed as an io.Reader instead of a file path
-//func UploadReader(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams) (*UploadResponse, error) {
-//	return UploadReaderWithClient(client, photoReader, name, optionalParams, nil)
-//}
+func UploadReader(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams) (*UploadResponse, error) {
+	return UploadReaderWithClient(client, photoReader, name, optionalParams, nil, nil)
+}
 
 // UploadReaderWithClient does same as UploadReader but allows passing a custom httpClient
 func UploadReaderWithClient(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams, httpClient *http.Client, c context.Context) (*UploadResponse, error) {
