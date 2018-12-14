@@ -56,13 +56,39 @@ type PhotoInfo struct {
 	Comments int `xml:"comments"`
 	// Notes XXX: not handled yet
 	// People XXX: not handled yet
-	// Tags XXX: not handled yet
+	Tags struct {
+		TagList []struct {
+			Id string `xml:"id,attr"`
+			Author string `xml:"author,attr"`
+			Raw string `xml:"raw,attr"`
+			Text string `xml:",innerxml"`
+		} `xml:"tag"`
+	} `xml:"tags"`
 	// Urls XXX: not handled yet
 }
 
 type PhotoInfoResponse struct {
 	flickr.BasicResponse
 	Photo PhotoInfo `xml:"photo"`
+}
+
+type PhotoSizesResponse struct {
+	flickr.BasicResponse
+	Sizes PhotoSizes `xml:"sizes"`
+}
+
+type PhotoSizes struct {
+	CanBlog int `xml:"canblog,attr"`
+	CanPrint int `xml:"canprint,attr"`
+	CanDownload int `xml:"candownload,attr"`
+	SizeList []struct {
+		Label string `xml:"label,attr"`
+		Width int `xml:"width,attr"`
+		Height int `xml:"height,attr"`
+		Source string `xml:"source,attr"`
+		Url string `xml:"url,attr"`
+		Media string `xml:"media,attr"`
+	} `xml:"size"`
 }
 
 type PhotoSearchResponse struct {
@@ -147,6 +173,23 @@ func GetInfo(client *flickr.FlickrClient, id string, secret string) (*PhotoInfoR
 	client.OAuthSign()
 
 	response := &PhotoInfoResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
+}
+
+// Get sizes of a Flickr photo
+func GetSizes(client *flickr.FlickrClient, id string, secret string) (*PhotoSizesResponse, error) {
+	client.Init()
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photos.getSizes")
+	client.Args.Set("photo_id", id)
+	if secret != "" {
+		client.Args.Set("secret", secret)
+	}
+	client.OAuthSign()
+
+	response := &PhotoSizesResponse{}
 	err := flickr.DoPost(client, response)
 	return response, err
 }
